@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>4 Pipeline walkthrough - RAG Cookbooks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "4 Pipeline walkthrough";
+        var mkdocs_page_input_path = "stage4_pipeline.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> RAG Cookbooks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage1_overview/">1 High‑level overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage2_deep_theory/">2  Deep Theory (First-Principles Explanation)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage3_components/">3  Core components</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">4 Pipeline walkthrough</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#0-bluf">0. BLUF</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-complete-rag-pipeline-birds-eye">1. Complete RAG Pipeline (Bird’s-Eye)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-ingest-phase-offline">2. Ingest Phase (Offline)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-1-chunking">Step 1. Chunking</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-2-embeddings">Step 2. Embeddings</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-3-vector-indexing">Step 3. Vector Indexing</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-query-phase-online">3. Query Phase (Online)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-4-user-query-embedding">Step 4. User Query → Embedding</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-5-retrieval">Step 5. Retrieval</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-6-context-builder">Step 6. Context Builder</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-7-llm-generator">Step 7. LLM Generator</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-8-final-answer">Step 8. Final Answer</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-compact-ascii-diagram-side-by-side-view">4. Compact ASCII Diagram (Side-by-Side View)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-data-flow-summary-table">5. Data Flow Summary Table</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage5_variants/">5 RAG Variants</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage6_limitations/">6 Limitations & debugging</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage7_colab_prereqs/">7 Colab prerequisites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage8_summary/">8 Final summary & checklist</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">RAG Cookbooks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">4 Pipeline walkthrough</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="stage-4-pipeline-walkthrough-with-diagrams">Stage 4 – Pipeline Walkthrough With Diagrams</h2>
+<h3 id="0-bluf">0. BLUF</h3>
+<p>End-to-end RAG = <strong>Ingest → Index → Retrieve → Prepare Context → Generate Answer</strong>. Below is the full pipeline with ASCII diagrams and internal data flow.</p>
+<hr />
+<h3 id="1-complete-rag-pipeline-birds-eye">1. Complete RAG Pipeline (Bird’s-Eye)</h3>
+<pre><code>   ┌──────────────────────────────────────────┐
+   │               INGEST PHASE               │
+   │  (Prepare and store your knowledge base) │
+   └──────────────────────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  1. Chunking              │
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  2. Embeddings            │
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  3. Vector Index (DB)     │
+         └───────────────────────────┘
+
+   ┌──────────────────────────────────────────┐
+   │               QUERY PHASE                │
+   └──────────────────────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  4. Query Embedding       │
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  5. Retriever (ANN + BM25)│
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  6. Context Builder       │
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  7. LLM Generator         │
+         └───────────────────────────┘
+                     │
+                     ▼
+         ┌───────────────────────────┐
+         │  8. Final Answer          │
+         └───────────────────────────┘
+</code></pre>
+<hr />
+<h3 id="2-ingest-phase-offline">2. Ingest Phase (Offline)</h3>
+<h4 id="purpose">Purpose</h4>
+<p>Prepare your corpus so the system can retrieve from it at runtime.</p>
+<hr />
+<h4 id="step-1-chunking">Step 1. Chunking</h4>
+<pre><code>Original Documents
+    │
+    ▼
+[Split into chunks of ~300–800 tokens with overlap]
+    │
+    ▼
+Chunked Corpus
+</code></pre>
+<p>Chunking rules:</p>
+<ul>
+<li>Maintain semantic coherence</li>
+<li>Include overlaps so meaning doesn’t break</li>
+<li>Preserve structure (Markdown headings, paragraphs)</li>
+</ul>
+<hr />
+<h4 id="step-2-embeddings">Step 2. Embeddings</h4>
+<pre><code>Each chunk ──► Embedding Model ──► Chunk Vector
+</code></pre>
+<p>Output = vector + metadata (doc_id, page_no, text).</p>
+<hr />
+<h4 id="step-3-vector-indexing">Step 3. Vector Indexing</h4>
+<pre><code>Chunk Vectors ─┐
+               ▼
+        [Vector Database]
+               │
+               └── stores:
+                     - vectors
+                     - raw text
+                     - metadata
+                     - ANN index
+</code></pre>
+<p>Vector DB builds internal ANN graphs for fast retrieval.</p>
+<hr />
+<h3 id="3-query-phase-online">3. Query Phase (Online)</h3>
+<p>This is the real-time flow when a user asks a question.</p>
+<hr />
+<h4 id="step-4-user-query-embedding">Step 4. User Query → Embedding</h4>
+<pre><code>User Query &quot;What is X?&quot;
+        │
+        ▼
+Embedding Model
+        │
+        ▼
+Query Vector
+</code></pre>
+<hr />
+<h4 id="step-5-retrieval">Step 5. Retrieval</h4>
+<pre><code> Query Vector
+      │
+      ▼
+ANN Search in Vector DB
+      │
+      ▼
+Top-K Candidate Chunks
+      │
+      ▼
+(Optional) Reranker (cross-encoder)
+      │
+      ▼
+Final Ranked Chunks
+</code></pre>
+<p>Hybrid RAG =
+Dense ANN output + BM25 sparse output → merged → reranked.</p>
+<hr />
+<h4 id="step-6-context-builder">Step 6. Context Builder</h4>
+<pre><code>     Final Chunks
+          │
+          ▼
+[Insert into prompt template]
+          │
+          ▼
+LLM-ready input:
+  &quot;You must answer using ONLY the passages below.
+   Question: ...
+   Context:
+   [chunk 1]
+   [chunk 2]
+   [chunk 3]&quot;
+</code></pre>
+<p>Controls:</p>
+<ul>
+<li>Token limit</li>
+<li>Deduplication</li>
+<li>Formatting</li>
+<li>Citations</li>
+<li>Instruction tuning</li>
+</ul>
+<hr />
+<h4 id="step-7-llm-generator">Step 7. LLM Generator</h4>
+<pre><code>(Question + Context)
+          │
+          ▼
+       LLM
+          │
+          ▼
+      Answer
+</code></pre>
+<p>LLM uses attention to align question tokens with relevant chunk tokens.</p>
+<hr />
+<h4 id="step-8-final-answer">Step 8. Final Answer</h4>
+<p>Grounded, cite-able output based on your data.</p>
+<hr />
+<h3 id="4-compact-ascii-diagram-side-by-side-view">4. Compact ASCII Diagram (Side-by-Side View)</h3>
+<pre><code>          ┌──────────────┐
+          │ User Query    │
+          └───────┬──────┘
+                  ▼
+           Embed Query
+                  │
+                  ▼
+        ┌───────────────────┐
+        │   Retriever       │
+        │ (ANN / Hybrid)    │
+        └───────┬───────────┘
+                ▼
+        Retrieved Chunks
+                │
+                ▼
+        Build Prompt (Context)
+                │
+                ▼
+            LLM (G)
+                │
+                ▼
+          Final Answer
+</code></pre>
+<p>Behind the scenes:</p>
+<pre><code>Documents → Chunking → Embeddings → Vector DB
+</code></pre>
+<hr />
+<h3 id="5-data-flow-summary-table">5. Data Flow Summary Table</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Input</th>
+<th>Processing</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chunking</td>
+<td>Raw docs</td>
+<td>segment text</td>
+<td>chunks</td>
+</tr>
+<tr>
+<td>Embedding</td>
+<td>chunks</td>
+<td>vector encoding</td>
+<td>chunk vectors</td>
+</tr>
+<tr>
+<td>Indexing</td>
+<td>chunk vectors</td>
+<td>ANN indexing</td>
+<td>searchable index</td>
+</tr>
+<tr>
+<td>Query Embedding</td>
+<td>query</td>
+<td>vector encoding</td>
+<td>query vector</td>
+</tr>
+<tr>
+<td>Retriever</td>
+<td>query vector</td>
+<td>similarity search</td>
+<td>top-k chunks</td>
+</tr>
+<tr>
+<td>Context Builder</td>
+<td>chunks</td>
+<td>prompt assembly</td>
+<td>LLM prompt</td>
+</tr>
+<tr>
+<td>Generator</td>
+<td>prompt</td>
+<td>reasoning + synthesis</td>
+<td>answer</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stage3_components/" class="btn btn-neutral float-left" title="3  Core components"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../stage5_variants/" class="btn btn-neutral float-right" title="5 RAG Variants">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../stage3_components/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../stage5_variants/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

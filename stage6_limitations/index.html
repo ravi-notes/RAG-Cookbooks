@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>6 Limitations & debugging - RAG Cookbooks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "6 Limitations \u0026 debugging";
+        var mkdocs_page_input_path = "stage6_limitations.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> RAG Cookbooks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage1_overview/">1 High‑level overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage2_deep_theory/">2  Deep Theory (First-Principles Explanation)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage3_components/">3  Core components</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage4_pipeline/">4 Pipeline walkthrough</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage5_variants/">5 RAG Variants</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">6 Limitations & debugging</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#0-bluf">0. BLUF</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-core-limitations-structural">1. Core Limitations (Structural)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#a-retrieval-quality-bottleneck">A. Retrieval quality bottleneck</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#b-context-window-limits">B. Context window limits</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#c-hallucination-tendency">C. Hallucination tendency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#d-embedding-model-mismatch">D. Embedding model mismatch</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#e-chunking-failures">E. Chunking failures</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#f-long-tail-queries">F. Long-tail queries</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#g-latencycost-issues">G. Latency/cost issues</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-failure-modes-what-you-see-and-why">2. Failure Modes (What You See and Why)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-debugging-patterns-practical-workflow">3. Debugging Patterns (Practical Workflow)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-1-inspect-retrieved-chunks">Pattern 1 — Inspect retrieved chunks</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-2-tune-chunking">Pattern 2 — Tune chunking</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-3-improve-embeddings">Pattern 3 — Improve embeddings</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-4-use-hybrid-retrieval">Pattern 4 — Use hybrid retrieval</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-5-add-a-reranker">Pattern 5 — Add a reranker</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-6-prompt-the-llm-to-ground-itself">Pattern 6 — Prompt the LLM to ground itself</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-7-reduce-context-clutter">Pattern 7 — Reduce context clutter</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-8-query-rewriting">Pattern 8 — Query rewriting</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-quick-debug-decision-tree">4. Quick Debug Decision Tree</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-hard-limits-what-rag-cannot-solve">5. Hard Limits (What RAG Cannot Solve)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage7_colab_prereqs/">7 Colab prerequisites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage8_summary/">8 Final summary & checklist</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">RAG Cookbooks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">6 Limitations & debugging</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="stage-6-limitations-and-debugging-patterns">Stage 6 – Limitations and Debugging Patterns</h2>
+<h3 id="0-bluf">0. BLUF</h3>
+<p>RAG almost always fails due to <strong>retrieval</strong>, <strong>chunking</strong>, <strong>prompting</strong>, or <strong>LLM drift</strong>. Fixing RAG = diagnosing which layer broke.</p>
+<hr />
+<h3 id="1-core-limitations-structural">1. Core Limitations (Structural)</h3>
+<h4 id="a-retrieval-quality-bottleneck">A. Retrieval quality bottleneck</h4>
+<p>If the correct chunk never reaches the LLM, the answer <strong>cannot</strong> be correct.</p>
+<p>Symptoms:</p>
+<ul>
+<li>Confident hallucinations</li>
+<li>“The answer is not in the provided context.”</li>
+<li>Nonsense or off-topic responses</li>
+</ul>
+<p>Root causes:</p>
+<ul>
+<li>Poor embeddings</li>
+<li>Chunking too small/large</li>
+<li>ANN index mis-tuned</li>
+<li>Domain-mismatch between embedding model and corpus</li>
+</ul>
+<hr />
+<h4 id="b-context-window-limits">B. Context window limits</h4>
+<p>LLMs can only use token-level attention within their window (e.g., 8k, 32k, 128k).</p>
+<p>Limits:</p>
+<ul>
+<li>Only a small slice of corpus is visible</li>
+<li>Adding more chunks ≠ better answer</li>
+<li>At scale (100k+ docs), retrieval precision becomes critical</li>
+</ul>
+<hr />
+<h4 id="c-hallucination-tendency">C. Hallucination tendency</h4>
+<p>Even with context, LLMs may:</p>
+<ul>
+<li>invent missing links</li>
+<li>over-generalize</li>
+<li>“smooth” contradictions</li>
+<li>merge unrelated chunks into one narrative</li>
+</ul>
+<p>Cause:
+LLM is trained to be <strong>fluent</strong>, not <strong>factual</strong>.</p>
+<hr />
+<h4 id="d-embedding-model-mismatch">D. Embedding model mismatch</h4>
+<p>General-purpose embeddings fail for:</p>
+<ul>
+<li>medical terminology</li>
+<li>legal norms</li>
+<li>code</li>
+<li>math</li>
+<li>tables</li>
+<li>finance documents</li>
+<li>multilingual corpora</li>
+</ul>
+<hr />
+<h4 id="e-chunking-failures">E. Chunking failures</h4>
+<p>Chunk too small → no full meaning
+Chunk too big → irrelevant background noise</p>
+<p>Without good chunking, retrieval collapses.</p>
+<hr />
+<h4 id="f-long-tail-queries">F. Long-tail queries</h4>
+<p>LLMs fail when:</p>
+<ul>
+<li>Query uses rare terms</li>
+<li>Query is extremely specific</li>
+<li>Query requires reading entire document sets (RAG can’t load everything)</li>
+</ul>
+<hr />
+<h4 id="g-latencycost-issues">G. Latency/cost issues</h4>
+<p>Rerankers, hybrid retrieval, graph-RAG increase accuracy but also latency and cost.</p>
+<hr />
+<h3 id="2-failure-modes-what-you-see-and-why">2. Failure Modes (What You See and Why)</h3>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Answer is hallucinated</td>
+<td>Retrieval failed; chunks irrelevant</td>
+</tr>
+<tr>
+<td>Answer is generic</td>
+<td>Prompt not instructing grounding; poor reranking</td>
+</tr>
+<tr>
+<td>Answer contradicts docs</td>
+<td>Bad chunk selection; multiple conflicting chunks</td>
+</tr>
+<tr>
+<td>Answer is incomplete</td>
+<td>Only partial chunk retrieved; chunk size too small</td>
+</tr>
+<tr>
+<td>“I cannot find information”</td>
+<td>Sparse-only retrieval failing on semantics</td>
+</tr>
+<tr>
+<td>Good chunks retrieved but answer bad</td>
+<td>LLM not grounded; context overload</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="3-debugging-patterns-practical-workflow">3. Debugging Patterns (Practical Workflow)</h3>
+<h4 id="pattern-1-inspect-retrieved-chunks">Pattern 1 — Inspect retrieved chunks</h4>
+<p>Always check the actual top-K retrieved results.</p>
+<p>If wrong → fix retrieval, not the LLM.</p>
+<p>Checklist:</p>
+<ul>
+<li>Are chunks topically aligned?</li>
+<li>Any missing keywords?</li>
+<li>Too much filler text?</li>
+<li>Wrong document sections?</li>
+</ul>
+<hr />
+<h4 id="pattern-2-tune-chunking">Pattern 2 — Tune chunking</h4>
+<p>Start with:</p>
+<ul>
+<li>size = 300–500 tokens</li>
+<li>overlap = 50–100 tokens</li>
+</ul>
+<p>Adjust based on domain:</p>
+<ul>
+<li><strong>Legal/medical</strong>: larger, structured chunks</li>
+<li><strong>Code</strong>: small chunks with file structure preserved</li>
+<li><strong>Wiki/Markdown</strong>: chunk by heading sections</li>
+</ul>
+<hr />
+<h4 id="pattern-3-improve-embeddings">Pattern 3 — Improve embeddings</h4>
+<p>Options:</p>
+<ul>
+<li>Switch to domain-specific embedding models</li>
+<li>Use larger embedding models</li>
+<li>Use multilingual embeddings if corpus spans languages</li>
+</ul>
+<hr />
+<h4 id="pattern-4-use-hybrid-retrieval">Pattern 4 — Use hybrid retrieval</h4>
+<p>Dense + BM25 fixes:</p>
+<ul>
+<li>rare tokens</li>
+<li>names</li>
+<li>numbers</li>
+<li>acronyms</li>
+<li>code identifiers</li>
+</ul>
+<p>Often gives the biggest jump in accuracy.</p>
+<hr />
+<h4 id="pattern-5-add-a-reranker">Pattern 5 — Add a reranker</h4>
+<p>Cross-encoders dramatically improve precision.</p>
+<p>Pipeline:</p>
+<pre><code>ANN top-50 → reranker → top-5 → LLM
+</code></pre>
+<hr />
+<h4 id="pattern-6-prompt-the-llm-to-ground-itself">Pattern 6 — Prompt the LLM to ground itself</h4>
+<p>Include constraints:</p>
+<ul>
+<li>“Answer <strong>only</strong> from provided context.”</li>
+<li>“If answer not present, say 'Not found'.”</li>
+<li>“Cite the exact context passages.”</li>
+<li>“Do not add external facts.”</li>
+</ul>
+<p>These reduce hallucination rate.</p>
+<hr />
+<h4 id="pattern-7-reduce-context-clutter">Pattern 7 — Reduce context clutter</h4>
+<p>Too many chunks dilute attention.</p>
+<p>Try:</p>
+<ul>
+<li>top-3 or top-4 instead of top-10</li>
+<li>reranking to get cleaner context</li>
+<li>context compression for long documents</li>
+</ul>
+<hr />
+<h4 id="pattern-8-query-rewriting">Pattern 8 — Query rewriting</h4>
+<p>LLM or rule-based agent reformulates the user question before retrieval.</p>
+<p>Example:
+Original: “What did the report say about testing?”
+Rewrite: “Summarize test procedures from the 2021 QA audit document.”</p>
+<p>Improves recall.</p>
+<hr />
+<h3 id="4-quick-debug-decision-tree">4. Quick Debug Decision Tree</h3>
+<pre><code>Bad answer?
+  ↓
+Check retrieved chunks:
+    Bad? → Fix embedding/chunking/retrieval.
+    Good? → Move on.
+  ↓
+Check prompt grounding:
+    Not strict? → Strengthen instructions.
+  ↓
+Check chunk quantity:
+    Too many? → Reduce K.
+    Too few? → Increase K + rerank.
+  ↓
+Check domain mismatch:
+    Use domain embedding model.
+  ↓
+Still bad?
+    Add hybrid search / reranker / agentic search.
+</code></pre>
+<hr />
+<h3 id="5-hard-limits-what-rag-cannot-solve">5. Hard Limits (What RAG Cannot Solve)</h3>
+<ul>
+<li>Does not generate new knowledge beyond docs</li>
+<li>Cannot ensure 100% truth even with perfect retrieval</li>
+<li>Cannot aggregate massive corpora above context window without compression systems</li>
+<li>Cannot replace fine-tuning when task requires reasoning style changes</li>
+<li>Does not understand diagrams, tables, or images unless multimodal embeddings are used</li>
+<li>Cannot fix contradictory source documents</li>
+<li>Cannot guarantee privacy if agentic retrieval is uncontrolled</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stage5_variants/" class="btn btn-neutral float-left" title="5 RAG Variants"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../stage7_colab_prereqs/" class="btn btn-neutral float-right" title="7 Colab prerequisites">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../stage5_variants/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../stage7_colab_prereqs/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

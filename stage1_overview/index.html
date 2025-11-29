@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>1 High‑level overview - RAG Cookbooks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "1 High\u2011level overview";
+        var mkdocs_page_input_path = "stage1_overview.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> RAG Cookbooks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">1 High‑level overview</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-what-problem-does-rag-solve">1. What problem does RAG solve?</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-one-sentence-definition">2. One-sentence definition</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-intuition-no-math-just-idea">3. Intuition (no math, just idea)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-key-moving-parts-birds-eye-view">4. Key moving parts (bird’s-eye view)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-end-to-end-flow-very-high-level">5. End-to-end flow (very high level)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-simple-ascii-diagram">6. Simple ASCII diagram</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-where-rag-fits-in-modern-llm-systems">7. Where RAG fits in modern LLM systems</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-why-this-is-a-big-deal">8. Why this is a big deal</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage2_deep_theory/">2  Deep Theory (First-Principles Explanation)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage3_components/">3  Core components</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage4_pipeline/">4 Pipeline walkthrough</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage5_variants/">5 RAG Variants</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage6_limitations/">6 Limitations & debugging</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage7_colab_prereqs/">7 Colab prerequisites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage8_summary/">8 Final summary & checklist</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">RAG Cookbooks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">1 High‑level overview</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>RAG = “LLM that first looks things up, then answers using what it found,” instead of answering only from its frozen training.</p>
+<hr />
+<h2 id="stage-1-high-level-conceptual-overview">Stage 1 – High-Level Conceptual Overview</h2>
+<h3 id="1-what-problem-does-rag-solve">1. What problem does RAG solve?</h3>
+<p>LLMs alone:</p>
+<ul>
+<li>Can hallucinate (sound confident but be wrong)</li>
+<li>Don’t know new/private data (trained on past public data)</li>
+<li>Can’t “remember” huge document sets in one prompt</li>
+</ul>
+<p>RAG solves:</p>
+<ul>
+<li>
+<p>“How do I make an LLM answer using <strong>my</strong> data (docs, DBs, PDFs, wiki, logs, etc.), while:</p>
+</li>
+<li>
+<p>reducing hallucinations</p>
+</li>
+<li>keeping answers grounded in real snippets</li>
+<li>updating knowledge without retraining the model?”</li>
+</ul>
+<hr />
+<h3 id="2-one-sentence-definition">2. One-sentence definition</h3>
+<ul>
+<li><strong>Retrieval-Augmented Generation (RAG)</strong> =
+  A pattern where an LLM <strong>retrieves</strong> relevant pieces of external data first, then <strong>generates</strong> an answer using both the user’s question and the retrieved data.</li>
+</ul>
+<hr />
+<h3 id="3-intuition-no-math-just-idea">3. Intuition (no math, just idea)</h3>
+<p>Think of RAG as:</p>
+<ul>
+<li>
+<p>A smart student taking an exam:</p>
+</li>
+<li>
+<p>Vanilla LLM = student answering from memory only</p>
+</li>
+<li>RAG = student allowed to quickly search notes/books, then answer</li>
+</ul>
+<p>Key intuition:</p>
+<ul>
+<li>
+<p>Separate:</p>
+</li>
+<li>
+<p><strong>“Store and search knowledge”</strong> (retrieval system)</p>
+</li>
+<li><strong>“Write the answer”</strong> (LLM)</li>
+<li>Then chain them:
+  Question → Search notes → Feed notes + question to LLM → Answer.</li>
+</ul>
+<hr />
+<h3 id="4-key-moving-parts-birds-eye-view">4. Key moving parts (bird’s-eye view)</h3>
+<p>At high level, a RAG system has:</p>
+<ul>
+<li><strong>Knowledge store</strong>
+  Your documents broken into small chunks and stored so they can be searched quickly.</li>
+<li><strong>Retriever</strong>
+  Given a question, it finds the most relevant chunks from the knowledge store.</li>
+<li>
+<p><strong>Generator (LLM)</strong>
+  Takes:</p>
+</li>
+<li>
+<p>the original question</p>
+</li>
+<li>the retrieved chunks
+    and writes a coherent answer grounded in those chunks.</li>
+</ul>
+<p>Later we’ll name them more precisely (embeddings, vector DB, etc.), but conceptually it’s just:</p>
+<blockquote>
+<p>Knowledge base + Search + Writer</p>
+</blockquote>
+<hr />
+<h3 id="5-end-to-end-flow-very-high-level">5. End-to-end flow (very high level)</h3>
+<ol>
+<li><strong>User asks:</strong>
+   “What are the side effects of drug X mentioned in our internal clinical guidelines?”</li>
+<li><strong>System searches:</strong>
+   It looks through your stored docs and picks a few relevant passages.</li>
+<li>
+<p><strong>LLM answers:</strong>
+   It reads the question + those passages and writes an answer that:</p>
+</li>
+<li>
+<p>cites or uses that content</p>
+</li>
+<li>ideally avoids inventing facts not in the docs.</li>
+</ol>
+<p>Process:</p>
+<blockquote>
+<p>Question → Retrieve relevant info → Generate answer using that info</p>
+</blockquote>
+<p>This is the “R → G” in RAG.</p>
+<hr />
+<h3 id="6-simple-ascii-diagram">6. Simple ASCII diagram</h3>
+<pre><code class="language-text">          ┌────────────────┐
+          │ User Question  │
+          └───────┬────────┘
+                  │
+                  v
+        ┌────────────────────┐
+        │   RETRIEVER        │
+        │ (search relevant   │
+        │  chunks/docs)      │
+        └───────┬────────────┘
+                │
+                v
+        ┌────────────────────┐
+        │ Retrieved Chunks   │
+        └───────┬────────────┘
+                │  (Question + Chunks)
+                v
+        ┌────────────────────┐
+        │  GENERATOR (LLM)   │
+        │  writes answer     │
+        └───────┬────────────┘
+                │
+                v
+        ┌────────────────────┐
+        │  Final Answer      │
+        └────────────────────┘
+</code></pre>
+<p>And in the background, you have:</p>
+<pre><code class="language-text">   ┌─────────────────────────────┐
+   │  Document Collection        │
+   │  (PDFs, pages, tickets,…)   │
+   └─────────────────────────────┘
+                  │
+                  v
+        [Preprocessed &amp; indexed into]
+   ┌─────────────────────────────┐
+   │  Knowledge Store (Index)    │
+   └─────────────────────────────┘
+</code></pre>
+<p>The retriever searches this knowledge store.</p>
+<hr />
+<h3 id="7-where-rag-fits-in-modern-llm-systems">7. Where RAG fits in modern LLM systems</h3>
+<p>RAG is commonly used for:</p>
+<ul>
+<li><strong>Chat over docs</strong>
+  “Ask questions about these PDFs / Confluence / Notion / codebase.”</li>
+<li><strong>Enterprise Q&amp;A</strong>
+  Internal policies, HR docs, product manuals.</li>
+<li><strong>Customer support bots</strong>
+  Use ticket history + FAQ + documentation.</li>
+<li><strong>Search + answer experience</strong>
+  “AI search” that shows sources and summary together.</li>
+</ul>
+<p>Conceptual stack:</p>
+<pre><code class="language-text">User ↔ Chat UI
+      ↓
+   RAG Layer
+  (retrieve + prompt)
+      ↓
+   Base LLM
+      ↓
+   Answer
+</code></pre>
+<p>RAG is a <strong>middleware pattern</strong> between your data and the LLM.</p>
+<hr />
+<h3 id="8-why-this-is-a-big-deal">8. Why this is a big deal</h3>
+<ul>
+<li>
+<p>You can:</p>
+</li>
+<li>
+<p>Plug an LLM into <strong>any private corpus</strong> (company docs, wiki, DB dumps)</p>
+</li>
+<li>Update knowledge by updating the index, <strong>without retraining</strong> the LLM</li>
+<li>Get more trustworthy answers by asking the LLM to “stick to retrieved context”</li>
+</ul>
+<p>RAG is therefore the default pattern for “LLM + your data” systems.s</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../stage2_deep_theory/" class="btn btn-neutral float-right" title="2  Deep Theory (First-Principles Explanation)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../stage2_deep_theory/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>5 RAG Variants - RAG Cookbooks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "5 RAG Variants";
+        var mkdocs_page_input_path = "stage5_variants.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> RAG Cookbooks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage1_overview/">1 High‑level overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage2_deep_theory/">2  Deep Theory (First-Principles Explanation)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage3_components/">3  Core components</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage4_pipeline/">4 Pipeline walkthrough</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">5 RAG Variants</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#0-bluf">0. BLUF</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-basic-rag-single-hop">1. Basic RAG (Single-Hop)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-multi-hop-rag">2. Multi-Hop RAG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_1">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_1">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#use-cases">Use Cases</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_1">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_1">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-hybrid-rag-dense-sparse">3. HyBRID RAG (Dense + Sparse)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_2">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_2">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_2">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_2">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-rag-with-reranking-cross-encoder">4. RAG with Reranking (Cross-Encoder)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_3">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_3">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_3">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_3">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-graph-rag">5. Graph RAG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_4">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_4">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_4">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_4">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-agentic-react-rag">6. Agentic / ReAct RAG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_5">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_5">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_5">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_5">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-context-compression-rag">7. Context-Compression RAG</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_6">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_6">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_6">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-adaptive-rag-router-based">8. Adaptive RAG (Router-Based)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#definition_7">Definition</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#diagram_6">Diagram</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#strengths_7">Strengths</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#weaknesses_7">Weaknesses</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-comparison-table-condensed">9. Comparison Table (Condensed)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage6_limitations/">6 Limitations & debugging</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage7_colab_prereqs/">7 Colab prerequisites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage8_summary/">8 Final summary & checklist</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">RAG Cookbooks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">5 RAG Variants</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="stage-5-rag-variants-and-their-tradeoffs">Stage 5 – RAG Variants and Their Tradeoffs</h2>
+<h3 id="0-bluf">0. BLUF</h3>
+<p>Variants differ in how they <strong>retrieve</strong>, <strong>route</strong>, and <strong>reason</strong>. They exist to fix typical failure modes (poor retrieval, multi-hop reasoning, context overload, niche domains).</p>
+<hr />
+<h3 id="1-basic-rag-single-hop">1. <strong>Basic RAG (Single-Hop)</strong></h3>
+<h4 id="definition">Definition</h4>
+<p>Retrieve top-K chunks once → pass to LLM → generate answer.</p>
+<h4 id="diagram">Diagram</h4>
+<pre><code>Query → Retrieve → LLM → Answer
+</code></pre>
+<h4 id="strengths">Strengths</h4>
+<ul>
+<li>Simple</li>
+<li>Fast</li>
+<li>Good for short, direct Q&amp;A</li>
+<li>Easy to implement (default in most libraries)</li>
+</ul>
+<h4 id="weaknesses">Weaknesses</h4>
+<ul>
+<li>Fails when answer requires multiple dependent facts</li>
+<li>Retrieval errors propagate directly to the LLM</li>
+<li>Limited to top-K context window constraints</li>
+</ul>
+<hr />
+<h3 id="2-multi-hop-rag">2. <strong>Multi-Hop RAG</strong></h3>
+<h4 id="definition_1">Definition</h4>
+<p>LLM performs <strong>iterative retrieval</strong>:
+Use the first retrieved context to refine the next query.</p>
+<h4 id="diagram_1">Diagram</h4>
+<pre><code>Query → Retrieve → LLM → Subquery
+                   ↑        │
+                   └─ Retrieve Again ─→ (repeat)
+</code></pre>
+<h4 id="use-cases">Use Cases</h4>
+<ul>
+<li>Questions requiring multi-step reasoning</li>
+<li>Linking information across documents</li>
+<li>“Explain relationships between A and B using corpus C”</li>
+</ul>
+<h4 id="strengths_1">Strengths</h4>
+<ul>
+<li>Much higher recall for complex tasks</li>
+<li>Better for research, legal, medical, financial analyses</li>
+</ul>
+<h4 id="weaknesses_1">Weaknesses</h4>
+<ul>
+<li>More latency</li>
+<li>Harder to control</li>
+<li>Requires strong query rewriting skills</li>
+</ul>
+<hr />
+<h3 id="3-hybrid-rag-dense-sparse">3. <strong>HyBRID RAG (Dense + Sparse)</strong></h3>
+<h4 id="definition_2">Definition</h4>
+<p>Combine semantic search (dense) with keyword search (BM25).</p>
+<h4 id="diagram_2">Diagram</h4>
+<pre><code>      Dense ANN ──┐
+                   ├── Merge → Rerank → Top-K
+      BM25 ───────┘
+</code></pre>
+<h4 id="strengths_2">Strengths</h4>
+<ul>
+<li>Best retrieval accuracy for most domains</li>
+<li>
+<p>Handles:</p>
+</li>
+<li>
+<p>synonyms</p>
+</li>
+<li>exact keywords</li>
+<li>numeric strings</li>
+<li>rare entities</li>
+<li>Reduces embedding model blind spots</li>
+</ul>
+<h4 id="weaknesses_2">Weaknesses</h4>
+<ul>
+<li>More components</li>
+<li>Heavier infra</li>
+<li>Requires scoring and weighting</li>
+</ul>
+<hr />
+<h3 id="4-rag-with-reranking-cross-encoder">4. <strong>RAG with Reranking (Cross-Encoder)</strong></h3>
+<h4 id="definition_3">Definition</h4>
+<p>Retriever collects many candidates (k=50–200) → cross-encoder re-scores relevance.</p>
+<h4 id="diagram_3">Diagram</h4>
+<pre><code>Top-100 candidates from ANN
+       ↓
+Cross-Encoder Rerank
+       ↓
+Final Top-K (3–8)
+</code></pre>
+<h4 id="strengths_3">Strengths</h4>
+<ul>
+<li>Dramatic improvement in precision</li>
+<li>Eliminates “garbage context”</li>
+<li>
+<p>Especially helpful in:</p>
+</li>
+<li>
+<p>legal</p>
+</li>
+<li>biomedical</li>
+<li>finance</li>
+<li>code search</li>
+</ul>
+<h4 id="weaknesses_3">Weaknesses</h4>
+<ul>
+<li>High latency</li>
+<li>Higher cost</li>
+<li>Needs GPU for speed</li>
+</ul>
+<hr />
+<h3 id="5-graph-rag">5. <strong>Graph RAG</strong></h3>
+<h4 id="definition_4">Definition</h4>
+<p>Build a graph of entities/relationships from corpus → retrieve subgraphs instead of raw chunks.</p>
+<h4 id="diagram_4">Diagram</h4>
+<pre><code>Corpus → entity extraction → graph
+Query → graph search → retrieve subgraph → LLM
+</code></pre>
+<h4 id="strengths_4">Strengths</h4>
+<ul>
+<li>Great for relationship-heavy corpora</li>
+<li>Multi-hop reasoning becomes explicit</li>
+<li>Excellent for highly structured domains</li>
+</ul>
+<h4 id="weaknesses_4">Weaknesses</h4>
+<ul>
+<li>Heavy preprocessing</li>
+<li>Requires reliable entity extraction</li>
+<li>Complex to maintain</li>
+</ul>
+<hr />
+<h3 id="6-agentic-react-rag">6. <strong>Agentic / ReAct RAG</strong></h3>
+<h4 id="definition_5">Definition</h4>
+<p>LLM acts as an agent that can issue actions:</p>
+<ul>
+<li>Search again</li>
+<li>Reformulate question</li>
+<li>Read more chunks</li>
+<li>Validate evidence</li>
+</ul>
+<h4 id="diagram_5">Diagram</h4>
+<pre><code>Query
+  ↓
+LLM → (action: search) → retriever → new context
+  ↓
+LLM → answer
+</code></pre>
+<h4 id="strengths_5">Strengths</h4>
+<ul>
+<li>Highly flexible</li>
+<li>LLM decides when/what to retrieve</li>
+<li>Long chains of reasoning possible</li>
+</ul>
+<h4 id="weaknesses_5">Weaknesses</h4>
+<ul>
+<li>Unpredictable behavior</li>
+<li>Harder to guarantee privacy constraints</li>
+<li>Latency spikes</li>
+</ul>
+<hr />
+<h3 id="7-context-compression-rag">7. <strong>Context-Compression RAG</strong></h3>
+<h4 id="definition_6">Definition</h4>
+<p>Compress chunks before adding to prompt:</p>
+<ul>
+<li>Summaries</li>
+<li>Extractive reduction</li>
+<li>Key sentences only</li>
+</ul>
+<h4 id="strengths_6">Strengths</h4>
+<ul>
+<li>Fits more info into limited context windows</li>
+<li>Useful for small LLMs</li>
+</ul>
+<h4 id="weaknesses_6">Weaknesses</h4>
+<ul>
+<li>Compression must preserve meaning</li>
+<li>Summaries may lose vital details</li>
+</ul>
+<hr />
+<h3 id="8-adaptive-rag-router-based">8. <strong>Adaptive RAG (Router-Based)</strong></h3>
+<h4 id="definition_7">Definition</h4>
+<p>Different query types → different retrievers or knowledge sources.</p>
+<h4 id="diagram_6">Diagram</h4>
+<pre><code>Router:
+  factual → RAG
+  reasoning → chain-of-thought
+  code → code-index
+</code></pre>
+<h4 id="strengths_7">Strengths</h4>
+<ul>
+<li>Reduces irrelevant retrieval</li>
+<li>Improves accuracy and latency</li>
+<li>Useful in enterprise setups</li>
+</ul>
+<h4 id="weaknesses_7">Weaknesses</h4>
+<ul>
+<li>Requires classifier or heuristics</li>
+<li>Complex pipeline</li>
+</ul>
+<hr />
+<h3 id="9-comparison-table-condensed">9. Comparison Table (Condensed)</h3>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>Purpose</th>
+<th>Strengths</th>
+<th>Weaknesses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic</td>
+<td>Simple QA</td>
+<td>Fast, easy</td>
+<td>Fails on multi-hop</td>
+</tr>
+<tr>
+<td>Multi-hop</td>
+<td>Complex reasoning</td>
+<td>Higher recall</td>
+<td>Slow, hard</td>
+</tr>
+<tr>
+<td>Hybrid</td>
+<td>Better accuracy</td>
+<td>Recovers dense+BM25</td>
+<td>Requires merging logic</td>
+</tr>
+<tr>
+<td>Reranker</td>
+<td>Precision</td>
+<td>Best top-K relevance</td>
+<td>High latency</td>
+</tr>
+<tr>
+<td>Graph</td>
+<td>Relationship-heavy data</td>
+<td>Structured, multi-hop</td>
+<td>Heavy preprocessing</td>
+</tr>
+<tr>
+<td>Agentic</td>
+<td>Adaptive retrieval</td>
+<td>Max flexibility</td>
+<td>Unpredictable</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td>Fit more info</td>
+<td>Good for small LLMs</td>
+<td>Risk of info loss</td>
+</tr>
+<tr>
+<td>Adaptive</td>
+<td>Smart routing</td>
+<td>Lower noise</td>
+<td>Complex design</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stage4_pipeline/" class="btn btn-neutral float-left" title="4 Pipeline walkthrough"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../stage6_limitations/" class="btn btn-neutral float-right" title="6 Limitations & debugging">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../stage4_pipeline/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../stage6_limitations/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

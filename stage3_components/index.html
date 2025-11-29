@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>3  Core components - RAG Cookbooks</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "3  Core components";
+        var mkdocs_page_input_path = "stage3_components.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> RAG Cookbooks
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage1_overview/">1 High‑level overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage2_deep_theory/">2  Deep Theory (First-Principles Explanation)</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">3  Core components</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#0-bluf">0. BLUF</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-embeddings-representation-layer">1. Embeddings (Representation Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#internals">Internals</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-embeddings-care-about">What embeddings care about</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-embeddings-fail-at">What embeddings fail at</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-chunking-preprocessing-layer">2. Chunking (Preprocessing Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose_1">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#key-internals">Key internals</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#failure-points">Failure points</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-vector-database-index-layer">3. Vector Database (Index Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose_2">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-components">Main components</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#how-ann-algorithms-work-simple">How ANN algorithms work (simple)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#popular-vector-dbs">Popular vector DBs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-retriever-selection-layer">4. Retriever (Selection Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose_3">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#types">Types</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-retrievers-optimize">What retrievers optimize</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-context-builder-prompt-construction-layer">5. Context Builder (Prompt Construction Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose_4">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#steps">Steps</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#common-patterns">Common patterns</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-generator-llm-layer">6. Generator (LLM Layer)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#purpose_5">Purpose</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#internals_1">Internals</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#model-choices">Model choices</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#what-affects-accuracy">What affects accuracy</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-putting-components-together-conceptual-stack">7. Putting components together (conceptual stack)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage4_pipeline/">4 Pipeline walkthrough</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage5_variants/">5 RAG Variants</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage6_limitations/">6 Limitations & debugging</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage7_colab_prereqs/">7 Colab prerequisites</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../stage8_summary/">8 Final summary & checklist</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">RAG Cookbooks</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">3  Core components</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="stage-3-components-and-their-internals">Stage 3 – Components and Their Internals</h2>
+<h3 id="0-bluf">0. BLUF</h3>
+<p>RAG has four core components: <strong>Embeddings → Vector DB → Retriever → Generator</strong>. Each has internal mechanics that determine overall quality.</p>
+<hr />
+<h3 id="1-embeddings-representation-layer">1. Embeddings (Representation Layer)</h3>
+<h4 id="purpose">Purpose</h4>
+<p>Convert text into dense numeric vectors that capture meaning.</p>
+<h4 id="internals">Internals</h4>
+<ul>
+<li><strong>Model type:</strong> Sentence Transformers, OpenAI, Cohere, bge</li>
+<li><strong>Output:</strong> A vector (e.g., 768 or 1024 dimensions)</li>
+<li>
+<p><strong>Training objective:</strong></p>
+</li>
+<li>
+<p>Contrastive learning (pull similar texts together, push dissimilar apart)</p>
+</li>
+<li><strong>Tokenization:</strong> Break text into tokens; model pools token-level representations → a single vector</li>
+<li>
+<p><strong>Pooling strategies:</strong></p>
+</li>
+<li>
+<p>Mean pooling (common, stable)</p>
+</li>
+<li>CLS token pooling (model-dependent)</li>
+</ul>
+<h4 id="what-embeddings-care-about">What embeddings care about</h4>
+<ul>
+<li>Semantic similarity</li>
+<li>Context around a passage</li>
+<li>Paraphrases</li>
+<li>Topic affinity</li>
+</ul>
+<h4 id="what-embeddings-fail-at">What embeddings fail at</h4>
+<ul>
+<li>Exact numeric matches</li>
+<li>Very long documents (truncate)</li>
+<li>Tables, code, formulas (unless specialized)</li>
+</ul>
+<hr />
+<h3 id="2-chunking-preprocessing-layer">2. Chunking (Preprocessing Layer)</h3>
+<h4 id="purpose_1">Purpose</h4>
+<p>Split documents into manageable, semantically coherent pieces.</p>
+<h4 id="key-internals">Key internals</h4>
+<ul>
+<li><strong>Chunk size:</strong> 200–1000 tokens depending on domain</li>
+<li><strong>Chunk overlap:</strong> 10–25% to preserve context between segments</li>
+<li>
+<p><strong>Segmentation strategy:</strong></p>
+</li>
+<li>
+<p>Sentence-based</p>
+</li>
+<li>Paragraph-based</li>
+<li>Markdown/HTML structure</li>
+<li>Sliding window for technical docs</li>
+</ul>
+<h4 id="failure-points">Failure points</h4>
+<ul>
+<li>Too small → lost narrative</li>
+<li>Too big → irrelevant filler reduces retrieval accuracy</li>
+<li>No overlap → boundary information lost</li>
+</ul>
+<p>Chunking = the “granularity dial” of RAG.</p>
+<hr />
+<h3 id="3-vector-database-index-layer">3. Vector Database (Index Layer)</h3>
+<h4 id="purpose_2">Purpose</h4>
+<p>Store embeddings and support fast similarity search.</p>
+<h4 id="main-components">Main components</h4>
+<ul>
+<li><strong>Storage:</strong> Vectors + metadata + chunk text</li>
+<li>
+<p><strong>Indexing algorithm:</strong></p>
+</li>
+<li>
+<p>HNSW (most used)</p>
+</li>
+<li>IVF/PQ (quantized)</li>
+<li>Flat (exact search, slow)</li>
+<li><strong>Distance metric:</strong> cosine / dot product</li>
+<li><strong>Filtering:</strong> metadata filters (“only from these docs”)</li>
+</ul>
+<h4 id="how-ann-algorithms-work-simple">How ANN algorithms work (simple)</h4>
+<ul>
+<li>Build a navigable graph where similar vectors are near each other</li>
+<li>During search, walk the graph to find neighbors quickly</li>
+<li>Trade small accuracy loss for huge speed gain</li>
+</ul>
+<h4 id="popular-vector-dbs">Popular vector DBs</h4>
+<ul>
+<li>FAISS</li>
+<li>Chroma</li>
+<li>Milvus</li>
+<li>Weaviate</li>
+<li>Pinecone</li>
+<li>LanceDB</li>
+</ul>
+<hr />
+<h3 id="4-retriever-selection-layer">4. Retriever (Selection Layer)</h3>
+<h4 id="purpose_3">Purpose</h4>
+<p>Given a question → identify top-K relevant chunks.</p>
+<h4 id="types">Types</h4>
+<ol>
+<li>
+<p><strong>Dense retriever</strong></p>
+</li>
+<li>
+<p>Embed query → compare with chunk embeddings</p>
+</li>
+<li>Pros: semantic, handles rephrasing</li>
+<li>
+<p>Cons: may miss names/numbers</p>
+</li>
+<li>
+<p><strong>Sparse retriever</strong></p>
+</li>
+<li>
+<p>BM25, TF-IDF</p>
+</li>
+<li>Pros: exact token matching</li>
+<li>
+<p>Cons: weak semantics</p>
+</li>
+<li>
+<p><strong>Hybrid retriever</strong></p>
+</li>
+<li>
+<p>Weighted mix of dense + sparse</p>
+</li>
+<li>
+<p>Best of both worlds</p>
+</li>
+<li>
+<p><strong>Rerankers (optional)</strong></p>
+</li>
+<li>
+<p>Cross-encoder rerank</p>
+</li>
+<li>Reads (query, chunk) together</li>
+<li>Much more accurate but slower</li>
+<li>Usually final ranking step after ANN search</li>
+</ol>
+<h4 id="what-retrievers-optimize">What retrievers optimize</h4>
+<ul>
+<li>Recall@K (ensure correct chunk is in the top-K)</li>
+<li>Relevance score</li>
+<li>Domain specificity</li>
+</ul>
+<hr />
+<h3 id="5-context-builder-prompt-construction-layer">5. Context Builder (Prompt Construction Layer)</h3>
+<h4 id="purpose_4">Purpose</h4>
+<p>Assemble the final input to the LLM.</p>
+<h4 id="steps">Steps</h4>
+<ul>
+<li>Merge top-K chunks</li>
+<li>Add instructions (“use only retrieved info”)</li>
+<li>Insert citations</li>
+<li>Control formatting</li>
+<li>Optimize for context length</li>
+</ul>
+<h4 id="common-patterns">Common patterns</h4>
+<ul>
+<li><strong>Stuffing:</strong> Put all chunks inside one prompt</li>
+<li><strong>Map-Reduce:</strong> Summaries of each chunk → reduced summary</li>
+<li><strong>ReAct / Chain-of-Thought:</strong> Additional reasoning steps</li>
+</ul>
+<hr />
+<h3 id="6-generator-llm-layer">6. Generator (LLM Layer)</h3>
+<h4 id="purpose_5">Purpose</h4>
+<p>Produce final answer grounded in retrieved evidence.</p>
+<h4 id="internals_1">Internals</h4>
+<ul>
+<li><strong>Self-attention</strong>: correlates question tokens ↔ chunk tokens</li>
+<li><strong>Reasoning</strong>: chain-of-thought (hidden or explicit)</li>
+<li><strong>Grounding</strong>: salience weighting of retrieved tokens</li>
+<li>
+<p><strong>Biases</strong>:</p>
+</li>
+<li>
+<p>hallucination tendency</p>
+</li>
+<li>preference for narrative</li>
+<li>token-level fluency over factuality</li>
+</ul>
+<h4 id="model-choices">Model choices</h4>
+<ul>
+<li>Llama</li>
+<li>Mistral</li>
+<li>GPT</li>
+<li>Gemma</li>
+<li>Qwen</li>
+</ul>
+<h4 id="what-affects-accuracy">What affects accuracy</h4>
+<ul>
+<li>Prompt instructions</li>
+<li>Size of model</li>
+<li>Cleanliness of retrieval</li>
+<li>Chunking quality</li>
+<li>Reranking effectiveness</li>
+</ul>
+<hr />
+<h3 id="7-putting-components-together-conceptual-stack">7. Putting components together (conceptual stack)</h3>
+<pre><code>   User Query
+        │
+        ▼
+   Embed Query
+        │
+        ▼
+   Retriever
+        │
+   (ANN search)
+        │
+        ▼
+   Retrieved Chunks
+        │
+   (build prompt)
+        │
+        ▼
+      LLM
+        │
+        ▼
+   Grounded Answer
+</code></pre>
+<p>Each box has independent hyperparameters that change system behavior.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stage2_deep_theory/" class="btn btn-neutral float-left" title="2  Deep Theory (First-Principles Explanation)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../stage4_pipeline/" class="btn btn-neutral float-right" title="4 Pipeline walkthrough">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../stage2_deep_theory/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../stage4_pipeline/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
