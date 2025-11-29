@@ -1,0 +1,14 @@
+site_name: RAG Cookbooks
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - 1 High‑level overview : stage1_overview.md
+  - 2  Deep Theory (First-Principles Explanation): stage2_deep_theory.md
+  - 3  Core components: stage3_components.md
+  - 4 Pipeline walkthrough : stage4_pipeline.md
+  - 5 RAG Variants : stage5_variants.md
+  - 6 Limitations & debugging : stage6_limitations.md
+  - 7 Colab prerequisites: stage7_colab_prereqs.md
+  - 8 Final summary & checklist : stage8_summary.md
