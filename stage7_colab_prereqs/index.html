@@ -70,13 +70,7 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">7 Colab prerequisites</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#minimal-components">Minimal components</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#install">Install</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pipeline-steps">Pipeline Steps</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#mini-architecture">Mini architecture</a>
+    <li class="toctree-l2"><a class="reference internal" href="#bluf">BLUF</a>
     </li>
     </ul>
                 </li>
@@ -108,37 +102,177 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="stage-7-minimal-prerequisites-for-a-colab-prototype">Stage 7 – Minimal Prerequisites for a Colab Prototype</h1>
-<h2 id="minimal-components">Minimal components</h2>
-<ul>
-<li>Small corpus  </li>
-<li>Chunker  </li>
-<li>Embedding model (MiniLM, bge-small)  </li>
-<li>Vector DB (FAISS)  </li>
-<li>Retriever  </li>
-<li>LLM API  </li>
-</ul>
-<hr />
-<h2 id="install">Install</h2>
-<pre><code>pip install sentence-transformers faiss-cpu langchain openai
-</code></pre>
-<hr />
-<h2 id="pipeline-steps">Pipeline Steps</h2>
+                <h2 id="stage-7-minimal-prerequisites-for-a-colab-prototype">Stage 7 – Minimal Prerequisites for a Colab Prototype</h2>
+<h3 id="bluf">BLUF</h3>
+<p>To build the <strong>smallest possible working RAG</strong> in Google Colab, you only need:</p>
 <ol>
-<li>Load text  </li>
-<li>Chunk  </li>
-<li>Embed chunks  </li>
-<li>Build FAISS index  </li>
-<li>Query embed  </li>
-<li>Retrieve  </li>
-<li>Build prompt  </li>
-<li>Generate answer  </li>
+<li>a few files, 2) one embedding model, 3) one vector DB, 4) one retriever, 5) one LLM call.
+   Nothing else.</li>
 </ol>
 <hr />
-<h2 id="mini-architecture">Mini architecture</h2>
-<pre><code>Docs → Chunk → Embed → FAISS  
-Query → Embed → Retrieve → LLM → Answer
+<h1 id="1-minimal-conceptual-requirements">1. Minimal Conceptual Requirements</h1>
+<h3 id="a-one-small-corpus">A. One small corpus</h3>
+<p>Examples:</p>
+<ul>
+<li>A text file</li>
+<li>A PDF converted to text</li>
+<li>A folder of <code>.txt</code> notes</li>
+<li>A few paragraphs you paste manually</li>
+</ul>
+<p>Keep it tiny to reduce noise.</p>
+<hr />
+<h3 id="b-a-chunker">B. A chunker</h3>
+<p>Simplest possible:</p>
+<ul>
+<li>Fixed size: 300–500 tokens</li>
+<li>Overlap: 50–100 tokens</li>
+<li>Use recursive text splitter in LangChain or a simple Python function</li>
+</ul>
+<hr />
+<h3 id="c-an-embedding-model">C. An embedding model</h3>
+<p>Pick one:</p>
+<ul>
+<li><strong>bge-small-en</strong> (fast, free, excellent)</li>
+<li><strong>sentence-transformers/all-MiniLM-L6-v2</strong></li>
+<li><strong>text-embedding-3-small</strong> (OpenAI; optional)</li>
+</ul>
+<p>For Colab: sentence-transformers is easiest.</p>
+<hr />
+<h3 id="d-a-vector-store">D. A vector store</h3>
+<p>Simplest/local options:</p>
+<ul>
+<li><strong>FAISS</strong> (best for Colab)</li>
+<li>Chroma (optional)</li>
+</ul>
+<p>FAISS keeps everything in RAM → zero infra complexity.</p>
+<hr />
+<h3 id="e-a-retriever">E. A retriever</h3>
+<p>FAISSStore.asRetriever(k=3) or Chroma.asRetriever().</p>
+<hr />
+<h3 id="f-an-llm">F. An LLM</h3>
+<p>At minimal:</p>
+<ul>
+<li><strong>GPT-4o-mini</strong> or <strong>GPT-4.1</strong> via API</li>
+<li>Or a local model like <strong>Qwen2.5 0.5B</strong> via transformers (only for demonstration)</li>
+</ul>
+<p>For Colab, simplest working pipeline uses OpenAI API.</p>
+<hr />
+<h1 id="2-minimal-technical-requirements-software">2. Minimal Technical Requirements (Software)</h1>
+<p>Install only these:</p>
+<pre><code>pip install langchain sentence-transformers faiss-cpu openai
 </code></pre>
+<p>Optional:</p>
+<ul>
+<li>PyPDF2 for PDFs</li>
+<li>tiktoken for token counting</li>
+</ul>
+<hr />
+<h1 id="3-minimum-pipeline-executable-sequence">3. Minimum Pipeline (Executable Sequence)</h1>
+<h3 id="step-1-load-documents">Step 1. Load documents</h3>
+<ul>
+<li>Read <code>.txt</code> or extract text from PDF</li>
+</ul>
+<h3 id="step-2-chunk-the-text">Step 2. Chunk the text</h3>
+<ul>
+<li>Use LangChain’s RecursiveCharacterTextSplitter or your own</li>
+</ul>
+<h3 id="step-3-embed-chunks">Step 3. Embed chunks</h3>
+<ul>
+<li>Using Sentence Transformers model</li>
+<li>Produce vectors</li>
+</ul>
+<h3 id="step-4-build-index">Step 4. Build index</h3>
+<ul>
+<li>Store vectors in FAISS</li>
+<li>Save chunk texts as metadata</li>
+</ul>
+<h3 id="step-5-build-retriever">Step 5. Build retriever</h3>
+<ul>
+<li>FAISS → retriever</li>
+</ul>
+<h3 id="step-6-build-rag-chain">Step 6. Build RAG chain</h3>
+<ul>
+<li>Query → embed → retrieve top-K chunks → format prompt → LLM → answer</li>
+</ul>
+<h3 id="step-7-test">Step 7. Test</h3>
+<p>Ask a question and inspect:</p>
+<ul>
+<li>Retrieved chunks</li>
+<li>Generated answer</li>
+</ul>
+<hr />
+<h1 id="4-minimal-working-rag-code-skeleton-pseudocode">4. Minimal Working RAG Code Skeleton (Pseudocode)</h1>
+<p><strong>This is not full code; it’s the conceptual “shape” of the notebook.</strong></p>
+<pre><code># 1. Load text
+text = open('notes.txt').read()
+
+# 2. Chunk
+chunks = chunk(text, size=500, overlap=100)
+
+# 3. Embed
+embeddings = embed(chunks)
+
+# 4. Index
+faiss_index = FAISS.from_embeddings(embeddings, chunks)
+
+# 5. Retriever
+retriever = faiss_index.as_retriever(k=5)
+
+# 6. Query
+query = &quot;What does the document say about X?&quot;
+query_vector = embed(query)
+
+results = retriever.get_relevant_documents(query)
+
+# 7. Prompt + LLM
+answer = call_llm(query, results)
+
+print(answer)
+</code></pre>
+<p>This is literally all needed for the smallest RAG demo.</p>
+<hr />
+<h1 id="5-minimal-notebook-structure-810-cells">5. Minimal Notebook Structure (8–10 cells)</h1>
+<ol>
+<li>Install packages</li>
+<li>Import libraries</li>
+<li>Load data</li>
+<li>Chunk data</li>
+<li>Load embedding model</li>
+<li>Generate + store embeddings</li>
+<li>Build FAISS index</li>
+<li>Query via retriever</li>
+<li>Build prompt</li>
+<li>Call LLM</li>
+</ol>
+<hr />
+<h1 id="6-practical-tips-for-the-beginner-prototype">6. Practical Tips for the Beginner Prototype</h1>
+<ul>
+<li>Use <strong>very small datasets</strong> (2–3 paragraphs) so you can inspect every chunk.</li>
+<li>Print <strong>retrieved chunks</strong> each time; this is essential for learning retrieval behavior.</li>
+<li>Start with <strong>top_k = 3</strong>.</li>
+<li>Keep your LLM prompt extremely simple in Stage 1.</li>
+<li>Do not add rerankers, hybrid search, or agent pipelines initially.</li>
+</ul>
+<p>Goal: <strong>functional correctness, not sophistication</strong>.</p>
+<hr />
+<h1 id="7-smallest-buildable-rag-architecture-diagram">7. Smallest Buildable RAG Architecture Diagram</h1>
+<pre><code>Documents ─→ Chunker ─→ Embedder ─→ FAISS Index
+                                            │
+                                    Query ─→│
+                                            ▼
+                                        Retriever
+                                            │
+                                            ▼
+                                   Prompt Constructor
+                                            │
+                                            ▼
+                                           LLM
+                                            ▼
+                                          Answer
+</code></pre>
+<hr />
+<p>Stage 7 complete.
+Say <strong>“continue”</strong> to proceed to <strong>Stage 8 → Final ultra-short summary + learning checklist</strong>.</p>
               
             </div>
           </div><footer>
